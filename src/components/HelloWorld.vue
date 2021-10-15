@@ -33,6 +33,7 @@
 			<div
 				v-for="(item, index) in checkDays"
 				:key="index + 'day'"
+				@click="activeDate"
 				:class="{
 					active:
 						index == currentDate - 1 &&
@@ -42,6 +43,9 @@
 			>
 				{{ item }}
 			</div>
+		</div>
+		<div class="btn">
+			<div class="btn_current" @click="backCurrentDate">返回当前日期</div>
 		</div>
 	</div>
 </template>
@@ -112,6 +116,13 @@ export default {
 			this.checkDays = this.getMonthDay(this.checkYear, this.checkMonth);
 			this.checkWeek = this.getMonthWeek(this.checkYear, this.checkMonth);
 		},
+		// 返回当前日期
+		backCurrentDate() {
+			this.checkYear = new Date().getFullYear();
+			this.checkMonth = new Date().getMonth();
+			this.checkDays = this.getMonthDay(this.checkYear, this.checkMonth);
+			this.checkWeek = this.getMonthWeek(this.checkYear, this.checkMonth);
+		},
 	},
 };
 </script>
@@ -153,9 +164,9 @@ export default {
 
 .calendar .day {
 	display: flex;
-	/* justify-content: space-between; */
 	flex-wrap: wrap;
 	width: 100%;
+	margin-bottom: 15px;
 }
 .calendar .day div {
 	padding-top: 30px;
@@ -171,12 +182,25 @@ export default {
 .calendar .day .active::before {
 	position: absolute;
 	top: 50%;
-	left: 50%;
+	left: 52%;
 	transform: translateX(-50%);
 	content: '';
 	width: 30px;
 	height: 30px;
 	border-radius: 50%;
 	background-color: rgba(235, 107, 107, 0.5);
+}
+.calendar .btn {
+	padding: 0 15px;
+}
+
+.calendar .btn .btn_current {
+	height: 35px;
+	line-height: 35px;
+	padding: 0 10px;
+	border-radius: 15px;
+	color: #ffffff;
+	background-color: rgb(206, 187, 187);
+	display: inline-block;
 }
 </style>
