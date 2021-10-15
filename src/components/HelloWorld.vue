@@ -97,9 +97,9 @@
 				class="view_width"
 				v-for="(item, index) in 12"
 				:key="item + 'month'"
-				@click="jumpMonth(item)"
+				@click="jumpMonth(index)"
 			>
-				{{ index }}月
+				{{ item }}月
 			</div>
 		</div>
 	</div>
