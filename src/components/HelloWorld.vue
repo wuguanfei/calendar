@@ -36,7 +36,12 @@
 			<div>六</div>
 		</div>
 		<!-- 日 -->
-		<div class="day">
+		<div
+			class="day"
+			@touchstart="start($event)"
+			@touchmove="move($event)"
+			@touchend="end($event)"
+		>
 			<div v-for="(item, index) in checkWeek" :key="index + 'space'"></div>
 			<div
 				v-for="(item, index) in checkDays"
@@ -228,6 +233,83 @@ export default {
 			);
 			// console.log(lunarDate);
 			return lunarDate;
+		},
+
+		// 左右滑动事件
+		getAngle(angx, angy) {
+			return (Math.atan2(angy, angx) * 180) / Math.PI;
+		},
+		getDirection(startx, starty, endx, endy) {
+			var angx = endx - startx;
+			var angy = endy - starty;
+			var result = 0; //默认标记没有滑动
+			//如果滑动距离太短
+			if (Math.abs(angx) < 2 && Math.abs(angy) < 2) {
+				return result;
+			}
+			var angle = this.getAngle(angx, angy);
+			if (angle >= -135 && angle <= -45) {
+				result = 1; //向上
+			} else if (angle > 45 && angle < 135) {
+				result = 2; //向下
+			} else if (
+				(angle >= 135 && angle <= 180) ||
+				(angle >= -180 && angle < -135)
+			) {
+				result = 3; //向左
+			} else if (angle >= -45 && angle <= 45) {
+				result = 4; //向右
+			}
+			return result;
+		},
+		start(event) {
+			let tabbarRef = this.$refs.tabbarRef;
+			let touchS = event.targetTouches[0]; //touches数组对象获得屏幕上所有的touch，取第一个touch
+			this.startPos = {
+				x: touchS.pageX,
+				y: touchS.pageY,
+				time: new Date(),
+			}; //取第一个touch的坐标值
+		},
+		move(event) {
+			//当屏幕有多个touch或者页面被缩放过，就不执行move操作
+			if (event.targetTouches.length > 1 || (event.scale && event.scale !== 1))
+				return;
+		},
+		end(event) {
+			let touchE = event.changedTouches[0];
+			this.endPos = {
+				x: touchE.pageX,
+				y: touchE.pageY,
+				timeStemp: new Date(),
+			};
+			let direction = this.getDirection(
+				this.startPos.x,
+				this.startPos.y,
+				this.endPos.x,
+				this.endPos.y
+			);
+			console.log(direction);
+			// 左滑（下一月）
+			if (direction == 3) {
+				if (this.checkMonth == 11) {
+					this.checkYear = this.checkYear + 1;
+					this.checkMonth = -1;
+				}
+				this.checkMonth = this.checkMonth + 1;
+				this.checkDays = this.getMonthDay(this.checkYear, this.checkMonth);
+				this.checkWeek = this.getMonthWeek(this.checkYear, this.checkMonth);
+			}
+			// 右滑（上一月）
+			else if (direction == 4) {
+				if (this.checkMonth == 0) {
+					this.checkYear = this.checkYear - 1;
+					this.checkMonth = 12;
+				}
+				this.checkMonth = this.checkMonth - 1;
+				this.checkDays = this.getMonthDay(this.checkYear, this.checkMonth);
+				this.checkWeek = this.getMonthWeek(this.checkYear, this.checkMonth);
+			}
 		},
 	},
 };
