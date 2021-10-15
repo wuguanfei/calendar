@@ -33,7 +33,6 @@
 			<div
 				v-for="(item, index) in checkDays"
 				:key="index + 'day'"
-				@click="activeDate"
 				:class="{
 					active:
 						index == currentDate - 1 &&
